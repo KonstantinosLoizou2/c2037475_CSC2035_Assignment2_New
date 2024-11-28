@@ -139,9 +139,11 @@ char* job_to_str(job_t* job, char* str) {
  * - see the hint for job_to_str
  */
 job_t* str_to_job(char* str, job_t* job) {
-    //int pid;
-    //unsigned int id,priority;
-    //char label[MAX_NAME_SIZE];
+
+    if (str==NULL||strlen(str)!=(JOB_STR_SIZE - 1)) { //probably this should be after job check
+        errno = EINVAL;
+        return NULL;
+    }
 
     if (job==NULL){
         job = (job_t*)malloc(sizeof(job_t));
@@ -151,11 +153,7 @@ job_t* str_to_job(char* str, job_t* job) {
             return NULL;
         }
     }
-    if (str==NULL||strlen(str)!=(JOB_STR_SIZE - 1)) {
 
-        errno = EINVAL;
-        return NULL;
-    }
     int read_string = sscanf(str,JOB_STR_FMT, &job->pid,&job->id,&job->priority,job->label);
     if (read_string != 4) { //maybe delete it?
         errno = EINVAL;
