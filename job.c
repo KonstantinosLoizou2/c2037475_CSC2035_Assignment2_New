@@ -89,9 +89,6 @@ job_t* job_set(job_t* job, pid_t pid, unsigned int id, unsigned int priority,
         errno = EINVAL;
         return NULL;
     }
-    if (job->pid == pid && job->id == id && job->priority == priority && strcmp(job->label,label)==0){
-        return job;
-    }
     job->pid = pid;
     job->id = id;
     job->priority = priority;

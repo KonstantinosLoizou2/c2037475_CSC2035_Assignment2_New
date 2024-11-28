@@ -74,7 +74,7 @@ job_t* joblog_read(proc_t* proc, int entry_num, job_t* job) {
     }
     char * file_name = new_log_name(proc);
     if (file_name == NULL){
-        errno=EINVAL; //possibly enomem
+        return NULL;
     }
     FILE* log_file;
     int line_num = 0;
@@ -95,15 +95,15 @@ job_t* joblog_read(proc_t* proc, int entry_num, job_t* job) {
                 }
             }
             str_to_job(buffer,job);
-            printf("line:%s\n",buffer);
-            printf("pid:%s\n", job->pid);
+            //printf("line:%s\n",buffer);
+            //printf("pid:%s\n", job->pid);
             fclose(log_file);
 
             return job;
         }
         line_num++;
     }
-    fclose(log_file); // posibly save ernno and assign
+    fclose(log_file);
     return NULL;
 }
 
