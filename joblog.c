@@ -69,22 +69,34 @@ int joblog_init(proc_t* proc) {
  * - see job.h for a function to create a job from its string representation
  */
 job_t* joblog_read(proc_t* proc, int entry_num, job_t* job) {
+    int saved_errno = errno;
     if (!proc||entry_num<0){
+        errno = saved_errno;
         return NULL;
     }
     char * file_name = new_log_name(proc);
     if (file_name == NULL){
+        errno = saved_errno;
         return NULL;
     }
     FILE* log_file;
     int line_num = 0;
     log_file = fopen(file_name, "r");
     if(!log_file){
-        errno = ENOENT; //no such file errno
+        errno = saved_errno;
+        //errno = ENOENT; //no such file errno
         return NULL;
     }
     char buffer[JOB_STR_SIZE];
     while (fgets(buffer, sizeof(buffer), log_file) != NULL) {
+
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        // Skip lines
+        if (strlen(buffer) == 0) {
+            continue;
+        }
+       // printf("Parsing line: '%s'\n", buffer); // Debugging line
         if (line_num == entry_num){
             if (job == NULL){
                 job = (job_t*)malloc(sizeof(job_t));
@@ -95,12 +107,10 @@ job_t* joblog_read(proc_t* proc, int entry_num, job_t* job) {
                 }
             }
             str_to_job(buffer,job);
-            //printf("line:%s\n",buffer);
-            //printf("pid:%s\n", job->pid);
             fclose(log_file);
-
             return job;
         }
+       // printf("line: %s\n", buffer);
         line_num++;
     }
     fclose(log_file);
@@ -114,7 +124,36 @@ job_t* joblog_read(proc_t* proc, int entry_num, job_t* job) {
  * - see the hint for joblog_read
  */
 void joblog_write(proc_t* proc, job_t* job) {
-    return;
+    if (proc == NULL||job == NULL){
+        return ;
+    }
+    char * file_name = new_log_name(proc);
+    if (file_name == NULL){
+        return ;
+    }
+    FILE* log_file;
+    log_file = fopen(file_name, "a");
+    if(!log_file){
+        return;
+    }
+    char proc_id_buffer[64];
+    snprintf(proc_id_buffer, sizeof(proc_id_buffer), "%07d", (int)job->pid);
+    char job_id_buffer[64];
+    snprintf(job_id_buffer, sizeof(job_id_buffer), "%05d", (int)job->id);
+
+    if (strlen(job->label)< MAX_NAME_SIZE){
+        memset((job->label)+ strlen(job->label),'*',(MAX_NAME_SIZE-1)-strlen(job->label));
+        job->label[MAX_NAME_SIZE-1] = '\0';
+    }
+    char entry[JOB_STR_SIZE];
+    snprintf(entry, JOB_STR_SIZE, JOB_STR_FMT, (int)job->pid, job->id, job->priority, job->label);
+    // Write log entry to the file
+    if (fprintf(log_file, "%s\n", entry) < 0) {
+        fclose(log_file);
+        return;
+    }
+
+    fclose(log_file);
 }
 
 /* 
