@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include "joblog.h"
+#include <string.h>
 
 /* 
  * DO NOT EDIT the new_log_name function. It is a private helper 

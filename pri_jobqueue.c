@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "pri_jobqueue.h"
+#include <errno.h>
 
 /* 
  * TODO: you must implement this function that allocates a job queue and 
@@ -13,14 +14,25 @@
  * - see job_new in job.c
  */
 pri_jobqueue_t* pri_jobqueue_new() {
-    return NULL;
+    pri_jobqueue_t* pjq= (pri_jobqueue_t*)malloc(sizeof(pri_jobqueue_t));
+    if(pjq==NULL){//use pri delete method to free the memory
+        errno = ENOMEM;
+        return NULL;
+    }
+    pri_jobqueue_init(pjq);
+    return pjq;
 }
 
 /* 
  * TODO: you must implement this function.
  */
 void pri_jobqueue_init(pri_jobqueue_t* pjq) {
-    return;
+    pjq->buf_size = JOB_BUFFER_SIZE;
+    pjq->size = 0;
+    for(int i = 0; i< JOB_BUFFER_SIZE; i++){
+        job_init((&(pjq->jobs[i])));
+    }
+
 }
 
 /* 
