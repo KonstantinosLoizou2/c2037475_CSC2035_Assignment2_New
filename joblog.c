@@ -89,7 +89,6 @@ job_t* joblog_read(proc_t* proc, int entry_num, job_t* job) {
     }
     char buffer[JOB_STR_SIZE];
     while (fgets(buffer, sizeof(buffer), log_file) != NULL) {
-
         buffer[strcspn(buffer, "\n")] = '\0';
 
         // Skip lines
@@ -160,5 +159,23 @@ void joblog_write(proc_t* proc, job_t* job) {
  * TODO: you must implement this function.
  */
 void joblog_delete(proc_t* proc) {
-    return;
+    int saved_errno= errno;
+    if(!proc){
+        errno= saved_errno;
+        return;
+    }
+
+    char * log_name = new_log_name(proc);
+
+    if(!log_name){
+        errno=saved_errno;
+        return;
+    }
+    if (unlink(log_name) == 0){
+        free(log_name);
+        errno = saved_errno;
+        return;
+    }
+    free(log_name);
+    errno = saved_errno;
 }
