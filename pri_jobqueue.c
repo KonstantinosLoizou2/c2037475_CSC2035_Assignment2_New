@@ -49,29 +49,22 @@ job_t* pri_jobqueue_dequeue(pri_jobqueue_t* pjq, job_t* dst) {
     if (pjq==NULL||pri_jobqueue_is_empty(pjq)){
         return NULL;
     }
-    int i;
-    //job_t* dequeued_job = &pjq->jobs[pjq->size - 1];
-    job_t* dequeued_job = pri_jobqueue_peek(pjq,dst);
-    for(i=0; i<pjq->size;i++){
-        if (job_is_equal(&pjq->jobs[i],dequeued_job)){
-            break;
-        }
+    job_t* dequeued_job = &pjq->jobs[pjq->size-1];
+    if (dequeued_job == NULL) {
+        return NULL;
     }
     if(dst!=NULL){
-        job_copy(&pjq->jobs[i],dst);
-        //job_set(&dst,pjq->jobs[i].pid,pjq->jobs[i].id,pjq->jobs[i].priority,pjq->jobs[i].label);
-        job_init((&(pjq->jobs[i])));
+        *dst = *dequeued_job;
+        job_init((&(pjq->jobs[pjq->size-1])));
         pjq->size--;
-        //pjq->size = pjq->size-2;
         return dst;
    }else{
         dst= (job_t*) malloc(sizeof(job_t));
         if (dst == NULL) {
             return NULL;
         }
-        job_copy(&pjq->jobs[i],dst);
-        job_init((&(pjq->jobs[i])));
-        //pjq->size = pjq->size-2;
+        *dst = *dequeued_job;
+        job_init((&(pjq->jobs[pjq->size-1])));
         pjq->size--;
         return dst;
     }
