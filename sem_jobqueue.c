@@ -113,7 +113,7 @@ sem_jobqueue_t* sem_jobqueue_new(proc_t* proc) {
  * TODO: you must implement this function according to the specification in
  * sem_jobqueue.h
  */
-job_t* sem_jobqueue_dequeue(sem_jobqueue_t* sjq, job_t* dst) {
+job_t* sem_jobqueue_dequeue(sem_jobqueue_t* sjq, job_t* dst) { //lower than 0 not ==1 remember check
     if(!sjq){
         return NULL;
     }
@@ -229,7 +229,7 @@ job_t* sem_jobqueue_peek(sem_jobqueue_t* sjq, job_t* dst) {
  */
 int sem_jobqueue_size(sem_jobqueue_t* sjq) {
     if (sjq == NULL) {
-        return -1; // should be 0 if according to ipc or pri
+        return 0; // should be 0 if according to ipc or pri
     }
     if (sem_wait(sjq->mutex) == -1) {
         return -1;
@@ -247,7 +247,7 @@ int sem_jobqueue_size(sem_jobqueue_t* sjq) {
  */
 int sem_jobqueue_space(sem_jobqueue_t* sjq) {
     if (sjq == NULL) {
-        return -1; //same as top
+        return 0;
     }
     if (sem_wait(sjq->mutex) == -1) {
         return 0;
