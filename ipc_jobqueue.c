@@ -10,7 +10,7 @@
 ipc_jobqueue_t* ipc_jobqueue_new(proc_t* proc) {
     ipc_jobqueue_t* ijq = ipc_new(proc, "ipc_jobq", sizeof(pri_jobqueue_t));
     
-    if (!ijq) 
+    if (!ijq)
         return NULL;
     
     if (proc->is_init)
@@ -26,7 +26,7 @@ ipc_jobqueue_t* ipc_jobqueue_new(proc_t* proc) {
  * - and remember you must call do_critical_work
  */
 job_t* ipc_jobqueue_dequeue(ipc_jobqueue_t* ijq, job_t* dst) {
-    if (!ijq)
+    if (ijq == NULL)
         return NULL;
     do_critical_work(ijq->proc);
     dst = pri_jobqueue_dequeue((pri_jobqueue_t*)ijq->addr,dst);
@@ -51,7 +51,7 @@ void ipc_jobqueue_enqueue(ipc_jobqueue_t* ijq, job_t* job) {
  * - see ipc_jobqueue_dequeue hint
  */
 bool ipc_jobqueue_is_empty(ipc_jobqueue_t* ijq) {
-    if(!ijq) {
+    if(ijq == NULL) {
         return true;
     }
     do_critical_work(ijq->proc);
@@ -67,7 +67,7 @@ bool ipc_jobqueue_is_empty(ipc_jobqueue_t* ijq) {
  * - see ipc_jobqueue_dequeue hint
  */
 bool ipc_jobqueue_is_full(ipc_jobqueue_t* ijq) {
-    if(!ijq)
+    if(ijq == NULL)
         return true;
     do_critical_work(ijq->proc);
     if(pri_jobqueue_is_full((pri_jobqueue_t*)ijq->addr)){
@@ -123,5 +123,8 @@ int ipc_jobqueue_space(ipc_jobqueue_t* ijq) {
  * - look at how the ipc_jobqueue is allocated in ipc_jobqueue_new
  */
 void ipc_jobqueue_delete(ipc_jobqueue_t* ijq) {
-    ipc_delete(ijq);
+    if(ijq!=NULL){
+        ipc_delete(ijq);
+    }
+
 }

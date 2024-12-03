@@ -194,7 +194,7 @@ int pri_jobqueue_space(pri_jobqueue_t* pjq) {
  *      - see pri_jobqeue_new
  */
 void pri_jobqueue_delete(pri_jobqueue_t* pjq) {
-    if (pjq ==NULL){
+    if (pjq!=NULL){
         free(pjq);
     }
 }
