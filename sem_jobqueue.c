@@ -114,7 +114,25 @@ sem_jobqueue_t* sem_jobqueue_new(proc_t* proc) {
  * sem_jobqueue.h
  */
 job_t* sem_jobqueue_dequeue(sem_jobqueue_t* sjq, job_t* dst) {
-    return NULL;
+    if(!sjq){
+        return NULL;
+    }
+    if (sem_wait(sjq->full) == -1) {
+        return NULL;
+    }
+    if (sem_wait(sjq->mutex) == -1) {
+        //restore the full semaphore count and return NULL.
+        //sem_post(sjq->full);
+        return NULL;
+    }
+    dst = ipc_jobqueue_dequeue((ipc_jobqueue_t*)sjq->ijq,dst);
+    if (sem_post(sjq->mutex) == -1) {
+        return NULL;
+    }
+    if (sem_post(sjq->empty) == -1) {
+        return NULL;
+    }
+    return dst;
 }
 
 /* 
@@ -122,7 +140,24 @@ job_t* sem_jobqueue_dequeue(sem_jobqueue_t* sjq, job_t* dst) {
  * sem_jobqueue.h
  */
 void sem_jobqueue_enqueue(sem_jobqueue_t* sjq, job_t* job) {
-    return;
+    if (sjq == NULL) {
+        return;
+    }
+    if (sem_wait(sjq->empty) == -1) {
+        return;
+    }
+    if (sem_wait(sjq->mutex) == -1) {
+        //restore the empty semaphore count and return.
+        //sem_post(sjq->empty);
+        return;
+    }
+    ipc_jobqueue_enqueue((ipc_jobqueue_t*)sjq->ijq,job);
+    if (sem_post(sjq->mutex) == -1) {
+        return;
+    }
+    if (sem_post(sjq->full) == -1) {
+        return;
+    }
 }
 
 /* 
@@ -130,7 +165,22 @@ void sem_jobqueue_enqueue(sem_jobqueue_t* sjq, job_t* job) {
  * sem_jobqueue.h
  */
 bool sem_jobqueue_is_empty(sem_jobqueue_t* sjq) {
-    return true;
+    if (sjq == NULL) {
+        return true;
+    }
+
+
+    if (sem_wait(sjq->mutex) == -1) {
+        return true;
+    }
+
+    bool is_empty = ipc_jobqueue_is_empty(sjq->ijq);
+
+    if (sem_post(sjq->mutex) == -1) {
+        return true;
+    }
+
+    return is_empty;
 }
 
 /* 
@@ -138,7 +188,21 @@ bool sem_jobqueue_is_empty(sem_jobqueue_t* sjq) {
  * sem_jobqueue.h
  */
 bool sem_jobqueue_is_full(sem_jobqueue_t* sjq) {
-    return true;
+    if (sjq == NULL) {
+        return true;
+    }
+
+    if (sem_wait(sjq->mutex) == -1) {
+        return true;
+    }
+
+    bool is_full = ipc_jobqueue_is_full(sjq->ijq);
+
+    if (sem_post(sjq->mutex) == -1) {
+        return true;
+    }
+
+    return is_full;
 }
 
 /* 
@@ -146,7 +210,17 @@ bool sem_jobqueue_is_full(sem_jobqueue_t* sjq) {
  * sem_jobqueue.h
  */
 job_t* sem_jobqueue_peek(sem_jobqueue_t* sjq, job_t* dst) {
-    return NULL;
+    if (sjq == NULL) {
+        return NULL;
+    }
+    if (sem_wait(sjq->mutex) == -1) {
+        return NULL;
+    }
+    job_t* peek_value = ipc_jobqueue_peek(sjq->ijq, dst);
+    if (sem_post(sjq->mutex) == -1) {
+        return NULL;
+    }
+    return peek_value;
 }
 
 /* 
@@ -154,7 +228,17 @@ job_t* sem_jobqueue_peek(sem_jobqueue_t* sjq, job_t* dst) {
  * sem_jobqueue.h
  */
 int sem_jobqueue_size(sem_jobqueue_t* sjq) {
-    return 0;
+    if (sjq == NULL) {
+        return -1; // should be 0 if according to ipc or pri
+    }
+    if (sem_wait(sjq->mutex) == -1) {
+        return -1;
+    }
+    int size = ipc_jobqueue_size(sjq->ijq);
+    if (sem_post(sjq->mutex) == -1) {
+        return -1;
+    }
+    return size;
 }
 
 /* 
@@ -162,7 +246,18 @@ int sem_jobqueue_size(sem_jobqueue_t* sjq) {
  * sem_jobqueue.h
  */
 int sem_jobqueue_space(sem_jobqueue_t* sjq) {
-    return 0;
+    if (sjq == NULL) {
+        return -1; //same as top
+    }
+    if (sem_wait(sjq->mutex) == -1) {
+        return 0;
+    }
+    int space = ipc_jobqueue_space(sjq->ijq);
+    if (sem_post(sjq->mutex) == -1) {
+        return 0;
+    }
+
+    return space;
 }
 
 /* 
@@ -173,5 +268,13 @@ int sem_jobqueue_space(sem_jobqueue_t* sjq) {
  *      order
  */
 void sem_jobqueue_delete(sem_jobqueue_t* sjq) {
-    return;
+    if (sjq != NULL) {
+        sem_delete(sjq->empty, sem_empty_label);
+        sem_delete(sjq->full, sem_full_label);
+        sem_delete(sjq->mutex, sem_mutex_label);
+        ipc_jobqueue_delete(sjq->ijq);
+        free(sjq);
+    }
+
+
 }

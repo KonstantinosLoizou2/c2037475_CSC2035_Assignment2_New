@@ -99,7 +99,6 @@ int ipc_jobqueue_size(ipc_jobqueue_t* ijq) {
         return 0;
     }
 
-
     do_critical_work(ijq->proc);
     return pri_jobqueue_size((pri_jobqueue_t*)ijq->addr);
 }
