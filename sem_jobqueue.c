@@ -147,8 +147,6 @@ void sem_jobqueue_enqueue(sem_jobqueue_t* sjq, job_t* job) {
         return;
     }
     if (sem_wait(sjq->mutex) == -1) {
-        //restore the empty semaphore count and return.
-        //sem_post(sjq->empty);
         return;
     }
     ipc_jobqueue_enqueue((ipc_jobqueue_t*)sjq->ijq,job);
@@ -229,7 +227,7 @@ job_t* sem_jobqueue_peek(sem_jobqueue_t* sjq, job_t* dst) {
  */
 int sem_jobqueue_size(sem_jobqueue_t* sjq) {
     if (sjq == NULL) {
-        return 0; // should be 0 if according to ipc or pri
+        return 0;
     }
     if (sem_wait(sjq->mutex) == -1) {
         return -1;

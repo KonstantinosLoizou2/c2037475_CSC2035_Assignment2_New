@@ -94,17 +94,6 @@ void pri_jobqueue_enqueue(pri_jobqueue_t* pjq, job_t* job) {
     if(job->priority<1){
         return;
     }
-    //if (pjq->size == 0){
-   //     job_set(&pjq->jobs[0],job->pid,job->id,job->priority,job->label);
-    //    pjq->size++;
-   // }
-   // if (pjq->jobs[pjq->size].priority == 0){
-      //  int m;
-       // for(m=0;m<((pjq->size)+1);m++){
-       //     pjq->jobs[m] = pjq->jobs[m + 1];
-        //}
-
-   // }
     int i;
     for(i=0; i<pjq->size;i++){
         if (pjq->jobs[i].priority<=job->priority){

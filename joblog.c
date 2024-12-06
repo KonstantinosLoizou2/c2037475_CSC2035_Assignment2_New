@@ -85,7 +85,6 @@ job_t* joblog_read(proc_t* proc, int entry_num, job_t* job) {
     log_file = fopen(file_name, "r");
     if(!log_file){
         errno = saved_errno;
-        //errno = ENOENT; //no such file errno
         return NULL;
     }
     char buffer[JOB_STR_SIZE];
@@ -110,7 +109,6 @@ job_t* joblog_read(proc_t* proc, int entry_num, job_t* job) {
             fclose(log_file);
             return job;
         }
-       // printf("line: %s\n", buffer);
         line_num++;
     }
     fclose(log_file);

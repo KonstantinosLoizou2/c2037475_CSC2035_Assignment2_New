@@ -55,8 +55,6 @@ void job_init(job_t* job) {
         job->priority = 0;
         strncpy(job->label,PAD_STRING, MAX_NAME_SIZE-1);
         job->label[MAX_NAME_SIZE-1] = '\0';
-    }else{
-        return;
     }
 }
 
