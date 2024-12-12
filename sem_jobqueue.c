@@ -164,7 +164,6 @@ bool sem_jobqueue_is_empty(sem_jobqueue_t* sjq) {
         return true;
     }
 
-
     if (sem_wait(sjq->mutex) == -1) {
         return true;
     }
