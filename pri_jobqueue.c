@@ -6,7 +6,6 @@
 #include <stdbool.h>
 #include "pri_jobqueue.h"
 #include <errno.h>
-#include <stdio.h>
 
 /* 
  * TODO: you must implement this function that allocates a job queue and 
