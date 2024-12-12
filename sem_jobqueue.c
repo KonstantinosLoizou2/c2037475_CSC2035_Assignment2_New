@@ -112,7 +112,7 @@ sem_jobqueue_t* sem_jobqueue_new(proc_t* proc) {
  * TODO: you must implement this function according to the specification in
  * sem_jobqueue.h
  */
-job_t* sem_jobqueue_dequeue(sem_jobqueue_t* sjq, job_t* dst) { //lower than 0 not ==1 remember check
+job_t* sem_jobqueue_dequeue(sem_jobqueue_t* sjq, job_t* dst) {
     if(!sjq){
         return NULL;
     }

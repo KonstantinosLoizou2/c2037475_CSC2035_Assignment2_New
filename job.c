@@ -150,7 +150,7 @@ job_t* str_to_job(char* str, job_t* job) {
     }
 
     int read_string = sscanf(str,JOB_STR_FMT, &job->pid,&job->id,&job->priority,job->label);
-    if (read_string != 4) { //maybe delete it?
+    if (read_string != 4) {
         errno = EINVAL;
         return NULL;
     }
