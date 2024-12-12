@@ -16,7 +16,7 @@
  */
 pri_jobqueue_t* pri_jobqueue_new() {
     pri_jobqueue_t* pjq= (pri_jobqueue_t*)malloc(sizeof(pri_jobqueue_t));
-    if(pjq==NULL){//use pri delete method to free the memory
+    if(pjq==NULL){
         errno = ENOMEM;
         return NULL;
     }
@@ -173,7 +173,7 @@ int pri_jobqueue_space(pri_jobqueue_t* pjq) {
     if (pjq == NULL) {
         return 0;
     }else{
-        return (pjq->buf_size) -(pjq->size); // or loop and count priority 0
+        return (pjq->buf_size) -(pjq->size);
     }
 }
 

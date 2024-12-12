@@ -91,11 +91,9 @@ job_t* joblog_read(proc_t* proc, int entry_num, job_t* job) {
     while (fgets(buffer, sizeof(buffer), log_file) != NULL) {
         buffer[strcspn(buffer, "\n")] = '\0';
 
-        // Skip lines
         if (strlen(buffer) == 0) {
             continue;
         }
-       // printf("Parsing line: '%s'\n", buffer); // Debugging line
         if (line_num == entry_num){
             if (job == NULL){
                 job = (job_t*)malloc(sizeof(job_t));
@@ -143,9 +141,10 @@ void joblog_write(proc_t* proc, job_t* job) {
         memset((job->label)+ strlen(job->label),'*',(MAX_NAME_SIZE-1)-strlen(job->label));
         job->label[MAX_NAME_SIZE-1] = '\0';
     }
+
     char entry[JOB_STR_SIZE];
     snprintf(entry, JOB_STR_SIZE, JOB_STR_FMT, (int)job->pid, job->id, job->priority, job->label);
-    // Write log entry to the file
+
     if (fprintf(log_file, "%s\n", entry) < 0) {
         fclose(log_file);
         return;

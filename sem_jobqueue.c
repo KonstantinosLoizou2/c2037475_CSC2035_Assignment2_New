@@ -68,7 +68,7 @@ sem_jobqueue_t* sem_jobqueue_new(proc_t* proc) {
     if (!sjq)
         return NULL;
         
-    sjq->ijq = ipc_jobqueue_new(proc);   // delays all but init process
+    sjq->ijq = ipc_jobqueue_new(proc);
     
     if (!sjq->ijq) {
         free(sjq);
@@ -91,10 +91,9 @@ sem_jobqueue_t* sem_jobqueue_new(proc_t* proc) {
     
     if (r & ALL_SEM_SUCCESS) {
         sem_post(sjq->mutex);
-        return sjq;    // all succeeded
+        return sjq;
     }
-    
-    // mutex failures    
+
     if (r & FULL_SEM_SUCCESS)
         sem_delete(sjq->full, sem_full_label);
 
@@ -121,8 +120,6 @@ job_t* sem_jobqueue_dequeue(sem_jobqueue_t* sjq, job_t* dst) { //lower than 0 no
         return NULL;
     }
     if (sem_wait(sjq->mutex) == -1) {
-        //restore the full semaphore count and return NULL.
-        //sem_post(sjq->full);
         return NULL;
     }
     dst = ipc_jobqueue_dequeue((ipc_jobqueue_t*)sjq->ijq,dst);
